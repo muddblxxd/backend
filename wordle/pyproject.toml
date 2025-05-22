@@ -1,0 +1,9 @@
+[project]
+name = "wordle"
+version = "0.1.0"
+description = "Backend pour le jeu Wordle"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi",
+    "uvicorn"
+]
