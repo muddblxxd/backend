@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu de Mot</title>
+    <script defer>
+        async function demarrerPartie() {
+            const response = await fetch("http://localhost:8000/api/v1/motdevine/nouveau");
+            const data = await response.json();
+            document.getElementById("message").textContent = data.message || "Partie démarrée.";
+            document.getElementById("game").innerHTML = ""; // Réinitialise l'affichage
+        }
+
+        async function envoyerEssai() {
+            const saisie = document.getElementById("guessInput").value.trim().toUpperCase();
+            if (saisie.length !== 5) {
+                alert("Le mot doit contenir exactement 5 lettres.");
+                return;
+            }
+
+            const response = await fetch(`http://localhost:8000/api/v1/motdevine/verifier?mot=${saisie}`);
+            const data = await response.json();
+
+            if (data.erreur) {
+                document.getElementById("message").textContent = data.erreur;
+                return;
+            }
+
+            // Affichage des lettres avec leurs couleurs
+            const resultat = data.mot_verifie;
+            const div = document.createElement("div");
+
+            resultat.forEach(item => {
+                const span = document.createElement("span");
+                span.textContent = item.lettre;
+                span.className = item.couleur; // vert, jaune, gris
+                span.style.margin = "5px";
+                div.appendChild(span);
+            });
+
+            document.getElementById("game").appendChild(div);
+            document.getElementById("guessInput").value = "";
+        }
+    </script>
+    <style>
+        .vert { color: green; font-weight: bold; }
+        .jaune { color: goldenrod; font-weight: bold; }
+        .gris { color: grey; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Devine le mot !</h1>
+    <p id="message">Clique sur "Nouvelle Partie" pour commencer.</p>
+    <input type="text" id="guessInput" maxlength="5" placeholder="Entrez un mot de 5 lettres" />
+    <button onclick="envoyerEssai()">Valider</button>
+    <button onclick="demarrerPartie()">Nouvelle Partie</button>
+    <div id="game" style="margin-top: 20px;"></div>
+</body>
+</html>
